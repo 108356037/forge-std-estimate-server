@@ -12,7 +12,7 @@ struct StdStorage {
     address _target;
     bytes32 _set;
 }
-
+bytes32 constant FVALUE = 0x0000000000000000000000000000000000000000000000000000000000001337;
 library stdStorageSafe {
     event SlotFound(address who, bytes4 fsig, bytes32 keysHash, uint256 slot);
     event WARNING_UninitedSlot(address who, uint256 slot);
@@ -69,7 +69,7 @@ library stdStorageSafe {
                     emit WARNING_UninitedSlot(who, uint256(reads[i]));
                 }
                 // store
-                vm.store(who, reads[i], bytes32(hex"1337"));
+                vm.store(who, reads[i], FVALUE);
                 bool success;
                 bytes memory rdat;
                 {
@@ -77,7 +77,7 @@ library stdStorageSafe {
                     fdat = bytesToBytes32(rdat, 32 * field_depth);
                 }
 
-                if (success && fdat == bytes32(hex"1337")) {
+                if (success && fdat == FVALUE) {
                     // we found which of the slots is the actual one
                     emit SlotFound(who, fsig, keccak256(abi.encodePacked(ins, field_depth)), uint256(reads[i]));
                     self.slots[who][fsig][keccak256(abi.encodePacked(ins, field_depth))] = uint256(reads[i]);
